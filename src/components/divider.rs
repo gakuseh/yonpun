@@ -16,31 +16,17 @@ You should have received a copy of the GNU General Public License along with
 Yonpun. If not, see <https://www.gnu.org/licenses/>. 
 */
 
-mod style;
-mod components;
-
 use freya::prelude::*;
+use crate::style;
 
-fn main() {
-    // *Start* your app with a window and its root component
-    launch(LaunchConfig::new()
-        .with_window(
-        WindowConfig::new(app)
-            .with_title("Yonpun")
-            .with_decorations(true)  // Hide window decorations (title bar)
-            .with_transparency(false)
-    ))
-}
-
-fn app() -> impl IntoElement {
-    // Declare the *UI*
-    rect()
-        .content(Content::Fit)
-        .width(Size::fill())
-        .height(Size::fill())
-        .background(style::BACKGROUND)
-        .color(Color::WHITE)
-        .font_family(style::FONT_FAMILY)
-        .child(components::Topbar)
-        .child(components::Dashboard)
+#[derive(PartialEq)]
+pub struct Divider;
+impl Component for Divider {
+    fn render(&self) -> impl IntoElement {
+        rect()
+            .height(Size::px(5.0))
+            .width(Size::fill_minimum())
+            .background(style::ACCENT) // Blue
+            .rounded()
+    }
 }

@@ -19,7 +19,7 @@ Yonpun. If not, see <https://www.gnu.org/licenses/>.
 use freya::prelude::*;
 use freya::radio;
 
-use crate::style;
+use crate::{style, components};
 
 #[derive(Default, Clone)]
 struct CurrentTabState {
@@ -79,7 +79,7 @@ impl Component for TopbarButton {
             .on_pointer_leave(move |_| *is_hovered.write() = false);
             
         if radio.read().current_tab == self.text {
-            container = container.child(Divider);
+            container = container.child(components::Divider);
         }
 
         if *is_hovered.read() {
@@ -89,17 +89,5 @@ impl Component for TopbarButton {
         }
         
         container
-    }
-}
-
-#[derive(PartialEq)]
-pub struct Divider;
-impl Component for Divider {
-    fn render(&self) -> impl IntoElement {
-        rect()
-            .height(Size::px(5.0))
-            .width(Size::fill_minimum())
-            .background(style::ACCENT) // Blue
-            .rounded()
     }
 }
