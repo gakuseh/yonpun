@@ -1,6 +1,14 @@
 # yonpun!
 
-Automatic timeblocking.
+yonpun is automatic timeblocking. You put in your tasks into a list, and yonpun
+gives you a calendar detailing exactly when to do what to meet all your
+deadlines.
+
+No AI, no signups, no nonsense. Just free and gratis timeblocking.
+
+yonpun is pronounced y-OWN-pu-n. Here are some
+[Forvo recordings of the pronunciation](https://forvo.com/word/%E5%9B%9B%E5%88%86/#ja)
+if you'd like.
 
 # Dependencies
 
