@@ -21,8 +21,13 @@ use freya::prelude::Color;
 pub const BACKGROUND: Color = Color::from_rgb(20, 24, 32);
 
 pub const PRIMARY: Color = Color::from_rgb(66, 71, 99);
+pub const HOVER_PRIMARY: Color = Color::from_rgb(88, 93, 117);
 
 pub const ACCENT: Color = Color::from_rgb(66, 133, 244);
+pub const HOVER_ACCENT: Color = Color::from_rgb(111, 161, 242);
+
+pub const ALERT: Color = Color::from_rgb(255, 153, 0);
+pub const HOVER_ALERT: Color = Color::from_rgb(255, 187, 84);
 
 // Font families
 pub const FONT_FAMILY: &str = "Open Sans";

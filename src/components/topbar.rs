@@ -47,7 +47,7 @@ impl Component for Topbar {
             .main_align(Alignment::SpaceAround)
             .cross_align(Alignment::Center)
             .child(
-                label().text("yonpun!").font_size(40.).font_family("Nunito").font_weight(FontWeight::EXTRA_BOLD)
+                label().text("yonpun!").font_size(40.).font_family("Nunito Extra Bold").font_weight(FontWeight::EXTRA_BOLD)
             )
             .child(TopbarButton::new("Dashboard"))
             .child(TopbarButton::new("To-do"))
