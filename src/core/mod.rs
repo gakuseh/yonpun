@@ -26,7 +26,7 @@ pub struct Label {
 }
 
 #[derive(PartialEq)]
-pub struct Task {
+pub struct Task<'a> {
     name: String,
     due_date: DateTime<Local>,
     schedule_after: Option<DateTime<Local>>,
@@ -34,5 +34,5 @@ pub struct Task {
     repeat_until: Option<DateTime<Local>>,
     duration_quarters: u32,
     minimum_split_size: u32,
-    label: &'static Label,
+    label: &'a Label,
 }
