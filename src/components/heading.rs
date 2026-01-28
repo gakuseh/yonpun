@@ -36,7 +36,7 @@ impl Component for Heading {
                 label()
                     .text(self.text)
                     .font_size(40.)
-                    .font_weight(FontWeight::SEMI_BOLD)
+                    .font_family("Merriweather")
             )
             .child(
                 components::Divider

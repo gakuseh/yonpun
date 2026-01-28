@@ -46,7 +46,9 @@ impl Component for Topbar {
             .direction(Direction::Horizontal)
             .main_align(Alignment::SpaceAround)
             .cross_align(Alignment::Center)
-            .child(label().text("Yonpun").font_size(30.).font_weight(FontWeight::SEMI_BOLD))
+            .child(
+                label().text("yonpun!").font_size(30.).font_family("Nunito").font_weight(FontWeight::EXTRA_BOLD)
+            )
             .child(TopbarButton::new("Dashboard"))
             .child(TopbarButton::new("To-do"))
             .child(TopbarButton::new("Calendar"))
@@ -76,7 +78,10 @@ impl Component for TopbarButton {
             .rounded_lg()
             .on_press(move |_| radio.write().current_tab = text_ref.to_string())
             .on_pointer_enter(move |_| *is_hovered.write() = true)
-            .on_pointer_leave(move |_| *is_hovered.write() = false);
+            .on_pointer_leave(move |_| *is_hovered.write() = false)
+            .font_family("Merriweather")
+            .font_weight(FontWeight::LIGHT)
+            .font_size(18.);
             
         if radio.read().current_tab == self.text {
             container = container.child(components::Divider);
