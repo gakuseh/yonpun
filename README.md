@@ -1,10 +1,12 @@
-# Yonpun!
+# yonpun!
 
 Automatic timeblocking.
 
 # Dependencies
 
 [Freya](https://github.com/marc2332/freya) for UI.
+
+[Chrono](https://github.com/chronotope/chrono) for timekeeping.
 
 # License Notice
 
