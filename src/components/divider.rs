@@ -26,7 +26,7 @@ impl Component for Divider {
         rect()
             .height(Size::px(5.0))
             .width(Size::fill_minimum())
-            .background(style::ACCENT) // Blue
+            .background(style::ACCENT)
             .rounded()
     }
 }
