@@ -18,6 +18,7 @@ Yonpun. If not, see <https://www.gnu.org/licenses/>.
 
 mod style;
 mod components;
+mod core;
 
 use freya::prelude::*;
 
@@ -56,5 +57,5 @@ fn app() -> impl IntoElement {
         .color(Color::WHITE)
         .font_family(style::FONT_FAMILY)
         .child(components::Topbar)
-        .child(components::Dashboard)
+        .child(components::ToDo)
 }
