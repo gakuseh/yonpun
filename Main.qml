@@ -276,10 +276,10 @@ ApplicationWindow {
                 topLeftRadius: 32
             }
 
-            leftInset: 128
-            rightInset: 128
-            topInset: 128
-            bottomInset: 128
+            leftInset: 64
+            rightInset: 64
+            topInset: 64
+            bottomInset: 64
 
             leftPadding: leftInset + 32
             rightPadding: rightInset + 32
