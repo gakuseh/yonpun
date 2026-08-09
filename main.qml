@@ -24,8 +24,8 @@ ApplicationWindow {
     visible: true
     width: 640
     height: 480
-    title: qsTr("Yonpun")
-    color: "#e8e8e8"
+    title: qsTr('Yonpun')
+    color: '#e8e8e8'
 
     component Title: RowLayout {
         property alias barColor: bar.color
@@ -48,6 +48,57 @@ ApplicationWindow {
         }
     }
 
+    component GreenButton: Button {
+        property alias t: label.text
+
+        id: root
+
+        background: Rectangle {
+            color: !root.down ? '#9bd65f' : '#89bc57'
+            border.color: '#bbbbbb'
+            border.width: 2
+        }
+
+        contentItem: Label {
+            id: label
+            color: 'black'
+        }
+    }
+
+    component OrangeButton: Button {
+        property alias t: label.text
+
+        id: root
+
+        background: Rectangle {
+            color: !root.down ? '#ffba00' : '#d69d00'
+            border.color: '#bbbbbb'
+            border.width: 2
+        }
+
+        contentItem: Label {
+            id: label
+            color: 'black'
+        }
+    }
+
+    component GrayButton: Button {
+        property alias t: label.text
+
+        id: root
+
+        background: Rectangle {
+            color: !root.down ? '#bbbbbb' : '#a0a0a0'
+            border.color: '#bbbbbb'
+            border.width: 2
+        }
+
+        contentItem: Label {
+            id: label
+            color: 'black'
+        }
+    }
+
     Dialog {
         id: dlg
         modal: true
@@ -57,29 +108,29 @@ ApplicationWindow {
         contentItem: Rectangle {
             id: card
             width: 320; height: 200
-            color: "white"
+            color: 'white'
             opacity: 0
             scale: 0.92
             anchors.centerIn: parent
             radius: 8
 
             Column { anchors.centerIn: parent; spacing: 8
-                Text { text: "Dialog title"; font.bold: true }
-                Text { text: "Body text goes here." }
+                Text { text: 'Dialog title'; font.bold: true }
+                Text { text: 'Body text goes here.' }
             }
         }
 
         enter: Transition {
             ParallelAnimation {
-                NumberAnimation { target: card; property: "opacity"; from: 0; to: 1; duration: 180; easing.type: Easing.OutCubic }
-                NumberAnimation { target: card; property: "scale";   from: 0.92; to: 1.0; duration: 240; easing.type: Easing.OutBack }
+                NumberAnimation { target: card; property: 'opacity'; from: 0; to: 1; duration: 180; easing.type: Easing.OutCubic }
+                NumberAnimation { target: card; property: 'scale';   from: 0.92; to: 1.0; duration: 240; easing.type: Easing.OutBack }
             }
         }
 
         exit: Transition {
             ParallelAnimation {
-                NumberAnimation { target: card; property: "opacity"; from: 1; to: 0; duration: 140; easing.type: Easing.InCubic }
-                NumberAnimation { target: card; property: "scale";   from: 1.0; to: 0.96; duration: 140; easing.type: Easing.InCubic }
+                NumberAnimation { target: card; property: 'opacity'; from: 1; to: 0; duration: 140; easing.type: Easing.InCubic }
+                NumberAnimation { target: card; property: 'scale';   from: 1.0; to: 0.96; duration: 140; easing.type: Easing.InCubic }
             }
         }
     }
@@ -89,23 +140,23 @@ ApplicationWindow {
         width: parent.width
 
         background: Rectangle {
-            color: "#ffffff"
+            color: '#ffffff'
         }
 
         TabButton {
-            text: qsTr("Dashboard")
+            text: qsTr('Dashboard')
         }
 
         TabButton {
-            text: qsTr("To-do")
+            text: qsTr('To-do')
         }
 
         TabButton {
-            text: qsTr("Calendar")
+            text: qsTr('Calendar')
         }
 
         TabButton {
-            text: qsTr("Settings")
+            text: qsTr('Settings')
         }
     }
 
@@ -129,8 +180,8 @@ ApplicationWindow {
             implicitHeight: 200
 
             background: Rectangle {
-                color: "#ffffff"
-                border.color: "#bbbbbb"
+                color: '#ffffff'
+                border.color: '#bbbbbb'
                 border.width: 1
                 topLeftRadius: 32
             }
@@ -154,9 +205,9 @@ ApplicationWindow {
                     anchors.right: parent.right
 
                     Title {
-                        text: "To-do"
-                        color: "black"
-                        barColor: "#ff445c"
+                        text: 'To-do'
+                        color: 'black'
+                        barColor: '#ff445c'
                     }
 
                     Item {
@@ -165,33 +216,39 @@ ApplicationWindow {
                     
                     RowLayout {
                         id: buttonWrapper
+                        spacing: 15
 
-                        Button {
-                            text: qsTr("Add")
+                        GreenButton {
+                            t: qsTr('Add task')
+
                             onClicked: {
                                 dlg.open()
                             }
                         }
 
-                        Button {
-                            text: qsTr("Add")
+                        OrangeButton {
+                            t: qsTr('Block out tasks')
                             onClicked: {
                                 dlg.open()
                             }
+                        }
+
+                        GrayButton {
+                            t: qsTr('Edit labels')
                         }
                     }                    
                 }
 
                 Label {
-                    text: "hello world"
+                    text: 'hello world'
                 }
 
                 Label {
-                    text: "hello world"
+                    text: 'hello world'
                 }
 
                 Label {
-                    text: "hello world"
+                    text: 'hello world'
                 }
             }
         }
