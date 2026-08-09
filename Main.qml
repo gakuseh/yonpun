@@ -143,11 +143,15 @@ ApplicationWindow {
 
         leftInset: -8
         rightInset: -8
+        topInset: -1
+        bottomInset: -1
 
         background: Rectangle {
             color: 'black'
             bottomLeftRadius: mainBar.leftInset * -1
             bottomRightRadius: mainBar.rightInset * -1
+            border.color: '#bbbbbb'
+            border.width: 1
         }
 
         Repeater {
