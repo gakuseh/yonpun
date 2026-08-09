@@ -17,34 +17,25 @@ Yonpun. If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include <QGuiApplication>
-#include <QFont>
 #include <QQmlApplicationEngine>
-#include <QtQuickControls2/QQuickStyle>
-#include <QQmlContext>
+#include <QFont>
 
-#include "todomodel.h"
-
-int main (int argc, char *argv[])
+int main(int argc, char *argv[])
 {
-    QCoreApplication::setOrganizationName("gakuseh");
-    QCoreApplication::setOrganizationDomain("gakuseh.dev");
-    QCoreApplication::setApplicationName("Yonpun");
-
     QGuiApplication app(argc, argv);
 
     QFont appFont = app.font();
     appFont.setPointSize(14);
     app.setFont(appFont);
 
-    QQuickStyle::setStyle("Basic"); // Eventually make custom style
-
     QQmlApplicationEngine engine;
+    QObject::connect(
+        &engine,
+        &QQmlApplicationEngine::objectCreationFailed,
+        &app,
+        []() { QCoreApplication::exit(-1); },
+        Qt::QueuedConnection);
+    engine.loadFromModule("yonpun", "Main");
 
-    TodoModel todoModel;
-    engine.rootContext()->setContextProperty("todoModel", &todoModel);
-
-    todoModel.addTodo("Buy milk");
-
-    engine.load("main.qml");
-    return app.exec();
+    return QGuiApplication::exec();
 }
