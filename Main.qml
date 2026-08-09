@@ -22,8 +22,9 @@ import QtQuick.Layouts 6.4
 
 ApplicationWindow {
     visible: true
-    width: 640
-    height: 480
+    width: 1000
+    height: 720
+    visibility: Window.Maximized
     title: qsTr('Yonpun')
     color: '#e8e8e8'
 
