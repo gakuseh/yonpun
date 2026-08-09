@@ -274,6 +274,9 @@ ApplicationWindow {
                 border.color: '#bbbbbb'
                 border.width: 1
                 topLeftRadius: 32
+                topRightRadius: 32
+                bottomLeftRadius: 32
+                bottomRightRadius: 32
             }
 
             leftInset: 64
