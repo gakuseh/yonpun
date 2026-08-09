@@ -254,28 +254,9 @@ ApplicationWindow {
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         currentIndex: mainBar.currentIndex
-        Rectangle {
-            color: 'teal'
-            implicitWidth: 200
-            implicitHeight: 200
 
-            Row {
-                Rectangle {
-                    width: 100
-                    height: 100
-                    color: 'red'
-                }
-
-                Label {
-                    text: 'hello world'
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-            }
-        }
-        Frame {
-            id: todoPage
-            implicitWidth: 300
-            implicitHeight: 200
+        component Page: Frame {
+            id: page
 
             background: Rectangle {
                 color: '#ffffff'
@@ -296,7 +277,20 @@ ApplicationWindow {
             rightPadding: rightInset + 32
             topPadding: topInset + 32
             bottomPadding: bottomInset + 32
+        }
+        
+        Page {
+            contentItem: Column {
+                spacing: 16
 
+                Title {
+                        text: 'Dashboard'
+                        color: '#9bd65f'
+                }
+            }
+        }
+
+        Page {
             contentItem: Column {
 
                 spacing: 16
@@ -338,17 +332,27 @@ ApplicationWindow {
                         }
                     }
                 }
+            }
+        }
 
-                Label {
-                    text: 'hello world'
+        Page {
+            contentItem: Column {
+                spacing: 16
+
+                Title {
+                        text: 'Calendar'
+                        color: '#ffba00'
                 }
+            }
+        }
 
-                Label {
-                    text: 'hello world'
-                }
+        Page {
+            contentItem: Column {
+                spacing: 16
 
-                Label {
-                    text: 'hello world'
+                Title {
+                        text: 'Settings'
+                        color: '#1153af'
                 }
             }
         }
