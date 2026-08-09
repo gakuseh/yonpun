@@ -53,6 +53,7 @@ ApplicationWindow {
         property alias t: label.text
 
         id: root
+        padding: 8
 
         background: Rectangle {
             color: !root.down ? '#9bd65f' : '#89bc57'
@@ -70,6 +71,7 @@ ApplicationWindow {
         property alias t: label.text
 
         id: root
+        padding: 8
 
         background: Rectangle {
             color: !root.down ? '#ffba00' : '#d69d00'
@@ -87,6 +89,7 @@ ApplicationWindow {
         property alias t: label.text
 
         id: root
+        padding: 8
 
         background: Rectangle {
             color: !root.down ? '#bbbbbb' : '#a0a0a0'
