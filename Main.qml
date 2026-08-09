@@ -152,29 +152,86 @@ ApplicationWindow {
 
         Repeater {
             model: [
-                { index: 0, text: qsTr('Dashboard'), color: 'green' },
-                { index: 1, text: qsTr('To-do'), color: 'blue' },
-                { index: 2, text: qsTr('Calendar'), color: 'purple' },
-                { index: 3, text: qsTr('Settings'), color: 'orange' }
+                { index: 0, text: qsTr('Dashboard'), color: '#9bd65f' },
+                { index: 1, text: qsTr('To-do'), color: '#ff445c' },
+                { index: 2, text: qsTr('Calendar'), color: '#ffba00' },
             ]
 
             TabButton {
                 required property var modelData
                 id: tabButton
-
-                leftPadding: 14
-                rightPadding: 14
-                topPadding: 8
-                bottomPadding: 8
+                leftPadding: 10
+                rightPadding: 50
                 width: implicitWidth
 
-                contentItem: Title {
-                    text: tabButton.modelData.text
-                    color: tabButton.modelData.color
+                contentItem: Row {
+                    spacing: 16
+
+                    Rectangle {
+                        anchors.verticalCenter: parent.verticalCenter
+                        color: tabButton.modelData.color
+                        width: 25
+                        height: 64
+                    }
+
+                    Column {
+                        anchors.verticalCenter: parent.verticalCenter
+                        Label {
+                            text: tabButton.modelData.index                            
+                            font.pixelSize: 32
+                            color: 'black'
+                        }
+
+                        Label {
+                            text: tabButton.modelData.text
+                            font.pixelSize: 20
+                            color: 'black'
+                        }
+                    }
+                    
                 }
 
                 background: Rectangle {
-                    color: mainBar.currentIndex == tabButton.modelData.index ? 'yellow' : 'white'
+                    color: if (mainBar.currentIndex == tabButton.modelData.index) {
+                        'yellow'
+                    } else if (tabButton.down) {
+                        'lightgray'
+                    } else {
+                        'white'
+                    }
+                }
+            }
+        }
+
+        TabButton {
+            id: settingsButton
+            topPadding: 20
+            leftPadding: 10
+            rightPadding: 50
+            width: implicitWidth
+
+            contentItem: Column {
+                anchors.verticalCenter: parent.verticalCenter
+                spacing: 8
+
+                Label {
+                    text: qsTr('⚙️')                           
+                    font.pixelSize: 32
+                    color: 'white'
+                }
+
+                Label {
+                    text: qsTr('Settings')
+                    font.pixelSize: 20
+                    color: 'white'
+                }
+            }
+
+            background: Rectangle {
+                color: if (settingsButton.down) {
+                    '#0c3c7f'
+                } else {
+                    '#1153af'
                 }
             }
         }
