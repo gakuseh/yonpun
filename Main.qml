@@ -136,6 +136,10 @@ ApplicationWindow {
     }
 
     TabBar {
+        Component.onCompleted: {
+            setCurrentIndex(0);
+        }
+
         id: mainBar
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: parent.top
