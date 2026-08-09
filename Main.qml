@@ -27,28 +27,24 @@ ApplicationWindow {
     title: qsTr('Yonpun')
     color: '#e8e8e8'
 
-    component Title: RowLayout {
-        property alias barColor: bar.color
-        property alias text: text.text
-        property alias color: text.color
-        property int barHeight: 32
+    component Title: Row {
+        property alias color: bar.color
+        property alias text: label.text
 
-        implicitWidth: bar.implicitWidth + spacing + text.implicitWidth
-        implicitHeight: Math.max(bar.implicitHeight, text.implicitHeight)
-
-        id: root
-        spacing: (1/3) * barHeight
+        spacing: 6
 
         Rectangle {
             id: bar
-            height: root.barHeight
-            implicitWidth: (1/3) * height
-            implicitHeight: height
+            width: 10
+            height: 32
+            anchors.verticalCenter: parent.verticalCenter
         }
 
         Label {
-            id: text
-            font.pixelSize: root.barHeight
+            id: label
+            anchors.verticalCenter: parent.verticalCenter
+            font.pixelSize: 32
+            color: 'black'
         }
     }
 
@@ -141,152 +137,45 @@ ApplicationWindow {
 
     TabBar {
         id: mainBar
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.top: parent.top
+        spacing: 8
+
+        leftInset: -8
+        rightInset: -8
 
         background: Rectangle {
-            color: '#ffffff'
+            color: 'black'
+            bottomLeftRadius: mainBar.leftInset * -1
+            bottomRightRadius: mainBar.rightInset * -1
         }
 
-        TabButton {
-            leftPadding: 14
-            rightPadding: 14
-            topPadding: 8
-            bottomPadding: 8
+        Repeater {
+            model: [
+                { index: 0, text: qsTr('Dashboard'), color: 'green' },
+                { index: 1, text: qsTr('To-do'), color: 'blue' },
+                { index: 2, text: qsTr('Calendar'), color: 'purple' },
+                { index: 3, text: qsTr('Settings'), color: 'orange' }
+            ]
 
-            implicitWidth: leftPadding + contentItem.implicitWidth + rightPadding
-            implicitHeight: topPadding + contentItem.implicitHeight + bottomPadding
+            TabButton {
+                required property var modelData
+                id: tabButton
 
-            Component.onCompleted: {
-                console.log('TabButton', 'Dashboard', 'width=', width, 'implicitWidth=', implicitWidth, 'contentWidth=', contentItem.width, 'contentImplicitWidth=', contentItem.implicitWidth)
-            }
+                leftPadding: 14
+                rightPadding: 14
+                topPadding: 8
+                bottomPadding: 8
+                width: implicitWidth
 
-            onWidthChanged: {
-                console.log('TabButton', 'Dashboard', 'width=', width, 'implicitWidth=', implicitWidth, 'contentWidth=', contentItem.width, 'contentImplicitWidth=', contentItem.implicitWidth)
-            }
-
-            contentItem: Title {
-                text: qsTr('Dashboard')
-                color: 'black'
-                barColor: 'green'
-
-                Component.onCompleted: {
-                    console.log('Title', text, 'width=', width, 'implicitWidth=', implicitWidth)
+                contentItem: Title {
+                    text: tabButton.modelData.text
+                    color: tabButton.modelData.color
                 }
 
-                onWidthChanged: {
-                    console.log('Title', text, 'width=', width, 'implicitWidth=', implicitWidth)
+                background: Rectangle {
+                    color: mainBar.currentIndex == tabButton.modelData.index ? 'yellow' : 'white'
                 }
-            }
-
-            background: Rectangle {
-                color: mainBar.currentIndex == 0 ? 'yellow' : 'white'
-            }
-        }
-
-        TabButton {
-            leftPadding: 14
-            rightPadding: 14
-            topPadding: 8
-            bottomPadding: 8
-
-            implicitWidth: leftPadding + contentItem.implicitWidth + rightPadding
-            implicitHeight: topPadding + contentItem.implicitHeight + bottomPadding
-
-            Component.onCompleted: {
-                console.log('TabButton', 'To-do', 'width=', width, 'implicitWidth=', implicitWidth, 'contentWidth=', contentItem.width, 'contentImplicitWidth=', contentItem.implicitWidth)
-            }
-
-            onWidthChanged: {
-                console.log('TabButton', 'To-do', 'width=', width, 'implicitWidth=', implicitWidth, 'contentWidth=', contentItem.width, 'contentImplicitWidth=', contentItem.implicitWidth)
-            }
-
-            contentItem: Title {
-                text: qsTr('To-do')
-                color: 'black'
-                barColor: 'blue'
-
-                Component.onCompleted: {
-                    console.log('Title', text, 'width=', width, 'implicitWidth=', implicitWidth)
-                }
-
-                onWidthChanged: {
-                    console.log('Title', text, 'width=', width, 'implicitWidth=', implicitWidth)
-                }
-            }
-
-            background: Rectangle {
-                color: mainBar.currentIndex == 1 ? 'yellow' : 'white'
-            }
-        }
-
-        TabButton {
-            leftPadding: 14
-            rightPadding: 14
-            topPadding: 8
-            bottomPadding: 8
-
-            implicitWidth: leftPadding + contentItem.implicitWidth + rightPadding
-            implicitHeight: topPadding + contentItem.implicitHeight + bottomPadding
-
-            Component.onCompleted: {
-                console.log('TabButton', 'Calendar', 'width=', width, 'implicitWidth=', implicitWidth, 'contentWidth=', contentItem.width, 'contentImplicitWidth=', contentItem.implicitWidth)
-            }
-
-            onWidthChanged: {
-                console.log('TabButton', 'Calendar', 'width=', width, 'implicitWidth=', implicitWidth, 'contentWidth=', contentItem.width, 'contentImplicitWidth=', contentItem.implicitWidth)
-            }
-
-            contentItem: Title {
-                text: qsTr('Calendar')
-                color: 'black'
-                barColor: 'purple'
-
-                Component.onCompleted: {
-                    console.log('Title', text, 'width=', width, 'implicitWidth=', implicitWidth)
-                }
-
-                onWidthChanged: {
-                    console.log('Title', text, 'width=', width, 'implicitWidth=', implicitWidth)
-                }
-            }
-
-            background: Rectangle {
-                color: mainBar.currentIndex == 2 ? 'yellow' : 'white'
-            }
-        }
-
-        TabButton {
-            leftPadding: 14
-            rightPadding: 14
-            topPadding: 8
-            bottomPadding: 8
-
-            implicitWidth: leftPadding + contentItem.implicitWidth + rightPadding
-            implicitHeight: topPadding + contentItem.implicitHeight + bottomPadding
-
-            Component.onCompleted: {
-                console.log('TabButton', 'Settings', 'width=', width, 'implicitWidth=', implicitWidth, 'contentWidth=', contentItem.width, 'contentImplicitWidth=', contentItem.implicitWidth)
-            }
-
-            onWidthChanged: {
-                console.log('TabButton', 'Settings', 'width=', width, 'implicitWidth=', implicitWidth, 'contentWidth=', contentItem.width, 'contentImplicitWidth=', contentItem.implicitWidth)
-            }
-
-            contentItem: Title {
-                text: qsTr('Settings')
-                color: 'black'
-                barColor: 'orange'
-
-                Component.onCompleted: {
-                    console.log('Title', text, 'width=', width, 'implicitWidth=', implicitWidth)
-                }
-
-                onWidthChanged: {
-                    console.log('Title', text, 'width=', width, 'implicitWidth=', implicitWidth)
-                }
-            }
-
-            background: Rectangle {
-                color: mainBar.currentIndex == 3 ? 'yellow' : 'white'
             }
         }
     }
@@ -304,6 +193,19 @@ ApplicationWindow {
             color: 'teal'
             implicitWidth: 200
             implicitHeight: 200
+
+            Row {
+                Rectangle {
+                    width: 100
+                    height: 100
+                    color: 'red'
+                }
+
+                Label {
+                    text: 'hello world'
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+            }
         }
         Frame {
             id: todoPage
@@ -337,8 +239,7 @@ ApplicationWindow {
 
                     Title {
                         text: 'To-do'
-                        color: 'black'
-                        barColor: '#ff445c'
+                        color: '#ff445c'
                     }
 
                     Item {
