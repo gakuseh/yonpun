@@ -17,6 +17,7 @@ Yonpun. If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include <QGuiApplication>
+#include <QFont>
 #include <QQmlApplicationEngine>
 #include <QtQuickControls2/QQuickStyle>
 #include <QQmlContext>
@@ -30,6 +31,10 @@ int main (int argc, char *argv[])
     QCoreApplication::setApplicationName("Yonpun");
 
     QGuiApplication app(argc, argv);
+
+    QFont appFont = app.font();
+    appFont.setPointSize(14);
+    app.setFont(appFont);
 
     QQuickStyle::setStyle("Basic"); // Eventually make custom style
 
