@@ -27,6 +27,7 @@ ApplicationWindow {
     visibility: Window.Maximized
     title: qsTr('Yonpun')
     color: '#e8e8e8'
+    palette.text: 'black'
 
     component Title: Row {
         property alias color: bar.color
@@ -55,10 +56,12 @@ ApplicationWindow {
         id: root
         padding: 8
 
+
         background: Rectangle {
             color: !root.down ? '#9bd65f' : '#89bc57'
             border.color: '#bbbbbb'
-            border.width: 2
+            border.width: 1
+            radius: 4
         }
 
         contentItem: Label {
@@ -76,7 +79,27 @@ ApplicationWindow {
         background: Rectangle {
             color: !root.down ? '#ffba00' : '#d69d00'
             border.color: '#bbbbbb'
-            border.width: 2
+            border.width: 1
+            radius: 4
+        }
+
+        contentItem: Label {
+            id: label
+            color: 'black'
+        }
+    }
+
+    component RedButton: Button {
+        property alias t: label.text
+
+        id: root
+        padding: 8
+
+        background: Rectangle {
+            color: !root.down ? '#ff445c' : '#d63a4f'
+            border.color: '#bbbbbb'
+            border.width: 1
+            radius: 4
         }
 
         contentItem: Label {
@@ -94,7 +117,8 @@ ApplicationWindow {
         background: Rectangle {
             color: !root.down ? '#bbbbbb' : '#a0a0a0'
             border.color: '#bbbbbb'
-            border.width: 2
+            border.width: 1
+            radius: 4
         }
 
         contentItem: Label {
@@ -103,39 +127,152 @@ ApplicationWindow {
         }
     }
 
-    Dialog {
+    component Modal : Dialog {
+        property Item body: null
+
         id: dlg
         modal: true
         x: parent.width/2 - width/2
         y: parent.height/2 - height/2
 
-        contentItem: Rectangle {
-            id: card
-            width: 320; height: 200
-            color: 'white'
-            opacity: 0
-            scale: 0.92
-            anchors.centerIn: parent
-            radius: 8
+        background: null
 
-            Column { anchors.centerIn: parent; spacing: 8
-                Text { text: 'Dialog title'; font.bold: true }
-                Text { text: 'Body text goes here.' }
+        contentItem: Frame {
+            id: actualContent
+
+            background: Rectangle {
+                color: '#ffffff'
+                border.color: '#bbbbbb'
+                border.width: 1
+                topLeftRadius: 8
+                topRightRadius: 8
+                bottomLeftRadius: 8
+                bottomRightRadius: 8
             }
+
+            contentItem: dlg.body
+
+            leftInset: 64
+            rightInset: 64
+            topInset: 64
+            bottomInset: 64
+
+            leftPadding: leftInset + 32
+            rightPadding: rightInset + 32
+            topPadding: topInset + 32
+            bottomPadding: bottomInset + 32
         }
 
         enter: Transition {
             ParallelAnimation {
-                NumberAnimation { target: card; property: 'opacity'; from: 0; to: 1; duration: 180; easing.type: Easing.OutCubic }
-                NumberAnimation { target: card; property: 'scale';   from: 0.92; to: 1.0; duration: 240; easing.type: Easing.OutBack }
+                NumberAnimation { target: actualContent; property: 'opacity'; from: 0; to: 1; duration: 180; easing.type: Easing.OutCubic }
+                NumberAnimation { target: actualContent; property: 'scale';   from: 0.92; to: 1.0; duration: 240; easing.type: Easing.OutBack }
             }
         }
 
         exit: Transition {
             ParallelAnimation {
-                NumberAnimation { target: card; property: 'opacity'; from: 1; to: 0; duration: 140; easing.type: Easing.InCubic }
-                NumberAnimation { target: card; property: 'scale';   from: 1.0; to: 0.96; duration: 140; easing.type: Easing.InCubic }
+                NumberAnimation { target: actualContent; property: 'opacity'; from: 1; to: 0; duration: 140; easing.type: Easing.InCubic }
+                NumberAnimation { target: actualContent; property: 'scale';   from: 1.0; to: 0.96; duration: 140; easing.type: Easing.InCubic }
             }
+        }
+    }
+
+    component TextInput : Column {
+        id: root
+        property string label: ''
+        property alias placeholderText: textField.placeholderText
+        property alias text: textField.text
+        spacing: 2
+
+        Label {
+            text: root.label
+            color: 'black'
+        }
+        
+        TextField {
+            id: textField
+            color: 'black'
+
+            width: root.width
+
+            background: Rectangle {
+                color: '#ffffff'
+                border.color: '#bbbbbb'
+                border.width: 1
+                radius: 4
+            }
+        }
+    }
+
+    Modal {
+        id: addTaskDialog
+        width: parent.width / 2
+        height: parent.height / 2
+
+        body: ColumnLayout {
+            spacing: 16
+            width: parent.width
+            height: parent.height
+
+            Title {
+                text: 'Add task'
+                color: '#ff455c'
+            }
+
+            TextInput {
+                id: taskNameField
+                label: 'Task name'
+                placeholderText: 'Enter task name'
+                width: parent.width
+            }
+
+            TextInput { // replace this with CalendarModel and MonthGrid
+                id: dueDateField
+                label: 'Due date'
+                placeholderText: 'Enter due date'
+                width: parent.width
+            }
+
+            Item {
+                Layout.fillHeight: true
+            }
+
+            RowLayout {
+                spacing: 16
+
+                RedButton {
+                    t: 'Add'
+                    onClicked: {
+                        console.warn('Add button clicked')
+                        addTaskDialog.accept()
+
+                        taskNameField.text = ''
+                        dueDateField.text = ''
+                    }
+                }
+
+                GrayButton {
+                    t: 'Cancel'
+                    onClicked: {
+                        console.warn('Cancel button clicked')
+                        addTaskDialog.reject()
+
+                        taskNameField.text = ''
+                        dueDateField.text = ''
+                    }
+                }
+            }
+        }
+
+        onAccepted: {
+            taskNameField.text = ''
+            dueDateField.text = ''
+        }
+
+        onRejected: {
+            taskNameField.text = ''
+            dueDateField.text = ''
         }
     }
 
@@ -266,10 +403,10 @@ ApplicationWindow {
                 color: '#ffffff'
                 border.color: '#bbbbbb'
                 border.width: 1
-                topLeftRadius: 32
-                topRightRadius: 32
-                bottomLeftRadius: 32
-                bottomRightRadius: 32
+                topLeftRadius: 8
+                topRightRadius: 8
+                bottomLeftRadius: 8
+                bottomRightRadius: 8
             }
 
             leftInset: 64
@@ -316,11 +453,11 @@ ApplicationWindow {
                         id: buttonWrapper
                         spacing: 15
 
-                        GreenButton {
+                        RedButton {
                             t: qsTr('Add task')
 
                             onClicked: {
-                                dlg.open()
+                                addTaskDialog.open()
                             }
                         }
 
