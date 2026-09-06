@@ -22,6 +22,7 @@ endif()
 
 qt_add_executable(appyonpun
     main.cpp
+    tasks.cpp
 )
 
 qt_add_qml_module(appyonpun
