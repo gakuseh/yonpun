@@ -433,8 +433,11 @@ Calendar Calendar::create(
 
 CalendarEvent Calendar::get_event_at_time(YotsubaTime time) const
 {
-    (void)time;
-    return CalendarEvent{std::weak_ptr<OnceTask>{}};
+    if (time < this->first_time || time >= this->first_time + static_cast<YotsubaTime>(events_by_time.size()))
+    {
+        return std::monostate{};
+    }
+    return events_by_time[static_cast<std::size_t>(time - this->first_time)];
 }
 
 std::vector<YotsubaTime> Calendar::get_times_of_event(CalendarEvent event) const
