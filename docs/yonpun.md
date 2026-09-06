@@ -153,6 +153,17 @@ Calendar is some data structure that
 - Be able to print out some representation of it (e.g. text for MVP, UI,
   ics/calendar app integration eventually)
 
+As an alias, `CalendarEvent` is typedef for
+`std::variant<weak_ptr<OnceTask>, ... , weak_ptr<RepeatingOffTime>>`
+
+Public accessor methods of Calendar include:
+
+- `CalendarEvent get_event_at_time(YotsubaTime time)`
+- `std::vector<YotsubaTime> get_times_of_event(CalendarEvent event)`
+
+As well as a factory method that takes in vector of shared_ptrs to OnceTasks,
+..., and RepeatingOffTimes and returns a Calendar.
+
 For the time --> task/offtime direction, use a vector. the vector only lasts
 from now to the last task/offtime or 30 days, which ever is greater. memory use
 of vector shouldn't be too bad, but if it is a problem then we'll need to fix it
