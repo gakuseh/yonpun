@@ -8,6 +8,13 @@ find_package(Qt6 REQUIRED COMPONENTS Quick QuickControls2)
 
 qt_standard_project_setup(REQUIRES 6.10)
 
+set(SQLITECPP_BUILD_TESTS OFF CACHE BOOL "Build SQLiteCpp tests")
+set(SQLITECPP_BUILD_EXAMPLES OFF CACHE BOOL "Build SQLiteCpp examples")
+set(SQLITECPP_INSTALL OFF CACHE BOOL "Install SQLiteCpp separately")
+set(SQLITECPP_RUN_CPPLINT OFF CACHE BOOL "Run SQLiteCpp cpplint")
+set(SQLITECPP_RUN_CPPCHECK OFF CACHE BOOL "Run SQLiteCpp cppcheck")
+add_subdirectory(thirdparty/SQLiteCpp EXCLUDE_FROM_ALL)
+
 # Content of downloaded design from Figma to Qt or similar
 if (EXISTS "${CMAKE_CURRENT_LIST_DIR}/importedcontent/CMakeLists.txt")
     add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/importedcontent)
@@ -38,6 +45,7 @@ target_link_libraries(appyonpun
     PRIVATE
         Qt6::Quick
         Qt6::QuickControls2
+        SQLiteCpp
 )
 
 install(TARGETS appyonpun
