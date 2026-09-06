@@ -360,7 +360,7 @@ void RepeatingOffTime::save()
     }
 }
 
-std::size_t CalendarEventHash::operator()(const CalendarEvent &event) const
+std::size_t CalendarVariantHash::operator()(const CalendarVariant &event) const
 {
     const std::size_t type = event.index();
     const std::size_t id = std::visit(
@@ -385,8 +385,8 @@ std::size_t CalendarEventHash::operator()(const CalendarEvent &event) const
     return static_cast<std::size_t>(x);
 }
 
-bool CalendarEventEqual::operator()(
-    const CalendarEvent &left, const CalendarEvent &right) const
+bool CalendarVariantEqual::operator()(
+    const CalendarVariant &left, const CalendarVariant &right) const
 {
     return left.index() == right.index() &&
            std::visit(
@@ -403,9 +403,9 @@ bool CalendarEventEqual::operator()(
 
 Calendar::Calendar(
     YotsubaTime first_time,
-    std::vector<CalendarEvent> &&events_by_time,
-    std::unordered_map<CalendarEvent, std::vector<YotsubaTime>,
-                       CalendarEventHash, CalendarEventEqual> &&times_by_event)
+    std::vector<CalendarVariant> &&events_by_time,
+    std::unordered_map<CalendarVariant, std::vector<YotsubaTime>,
+                       CalendarVariantHash, CalendarVariantEqual> &&times_by_event)
     : first_time(first_time),
       events_by_time(std::move(events_by_time)),
       times_by_event(std::move(times_by_event))
@@ -426,12 +426,12 @@ Calendar Calendar::create(
     (void)repeating_off_times;
     return Calendar(
         0,
-        std::vector<CalendarEvent>{},
-        std::unordered_map<CalendarEvent, std::vector<YotsubaTime>,
-                           CalendarEventHash, CalendarEventEqual>{});
+        std::vector<CalendarVariant>{},
+        std::unordered_map<CalendarVariant, std::vector<YotsubaTime>,
+                           CalendarVariantHash, CalendarVariantEqual>{});
 }
 
-CalendarEvent Calendar::get_event_at_time(YotsubaTime time) const
+CalendarVariant Calendar::get_event_at_time(YotsubaTime time) const
 {
     if (time < this->first_time || time >= this->first_time + static_cast<YotsubaTime>(events_by_time.size()))
     {
@@ -440,7 +440,7 @@ CalendarEvent Calendar::get_event_at_time(YotsubaTime time) const
     return events_by_time[static_cast<std::size_t>(time - this->first_time)];
 }
 
-std::vector<YotsubaTime> Calendar::get_times_of_event(CalendarEvent event) const
+std::vector<YotsubaTime> Calendar::get_times_of_event(CalendarVariant event) const
 {
     (void)event;
     return {};
