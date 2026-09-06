@@ -161,7 +161,8 @@ private:
           is_buffer(is_buffer) {}
 };
 
-using CalendarEvent = std::variant<std::weak_ptr<OnceTask>,
+using CalendarEvent = std::variant<std::monostate,
+                                   std::weak_ptr<OnceTask>,
                                    std::weak_ptr<RepeatingTask>,
                                    std::weak_ptr<OnceOffTime>,
                                    std::weak_ptr<RepeatingOffTime>>;
@@ -186,6 +187,8 @@ public:
         std::vector<std::shared_ptr<OnceOffTime>> once_off_times,
         std::vector<std::shared_ptr<RepeatingOffTime>> repeating_off_times);
 
+    /* Returns the event at the given time, or an empty event
+    (i.e. std::monostate) if either no event is scheduled at that time or is out of bounds. */
     CalendarEvent get_event_at_time(YotsubaTime time) const;
     std::vector<YotsubaTime> get_times_of_event(CalendarEvent event) const;
 
