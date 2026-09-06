@@ -2,22 +2,24 @@
 
 #include <SQLiteCpp/SQLiteCpp.h>
 
-namespace {
-
-std::unique_ptr<SQLite::Database> db;
-
-SQLite::Database& database()
+namespace
 {
-    return *db;
-}
 
-void open_database(const char* database_path)
-{
-    if (!db || db->getFilename() != database_path) {
-        db.reset(new SQLite::Database(
-            database_path, SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE));
+    std::unique_ptr<SQLite::Database> db;
+
+    SQLite::Database &database()
+    {
+        return *db;
     }
-}
+
+    void open_database(const char *database_path)
+    {
+        if (!db || db->getFilename() != database_path)
+        {
+            db.reset(new SQLite::Database(
+                database_path, SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE));
+        }
+    }
 
 }
 
@@ -26,7 +28,7 @@ std::vector<std::shared_ptr<RepeatingTask>> RepeatingTask::repo_vector;
 std::vector<std::shared_ptr<OnceOffTime>> OnceOffTime::repo_vector;
 std::vector<std::shared_ptr<RepeatingOffTime>> RepeatingOffTime::repo_vector;
 
-void setup_all(const char* database_path)
+void setup_all(const char *database_path)
 {
     open_database(database_path);
     OnceTask::setup(database_path);
@@ -35,7 +37,7 @@ void setup_all(const char* database_path)
     RepeatingOffTime::setup(database_path);
 }
 
-void OnceTask::setup(const char* database_path)
+void OnceTask::setup(const char *database_path)
 {
     open_database(database_path);
     database().exec(
@@ -50,9 +52,10 @@ void OnceTask::setup(const char* database_path)
 
     repo_vector.clear();
     SQLite::Statement query(database(),
-        "SELECT id, name, duration, minimum_split_size, due_date, schedule_after "
-        "FROM once_tasks");
-    while (query.executeStep()) {
+                            "SELECT id, name, duration, minimum_split_size, due_date, schedule_after "
+                            "FROM once_tasks");
+    while (query.executeStep())
+    {
         repo_vector.push_back(std::shared_ptr<OnceTask>(new OnceTask(
             query.getColumn(0).getInt64(),
             query.getColumn(1).getString(),
@@ -71,9 +74,9 @@ std::shared_ptr<OnceTask> OnceTask::create(
     YotsubaTime minimum_split_size)
 {
     SQLite::Statement insert(database(),
-        "INSERT INTO once_tasks "
-        "(name, duration, minimum_split_size, due_date, schedule_after) "
-        "VALUES (?, ?, ?, ?, ?)");
+                             "INSERT INTO once_tasks "
+                             "(name, duration, minimum_split_size, due_date, schedule_after) "
+                             "VALUES (?, ?, ?, ?, ?)");
     insert.bind(1, name);
     insert.bind(2, duration);
     insert.bind(3, minimum_split_size);
@@ -91,8 +94,8 @@ std::shared_ptr<OnceTask> OnceTask::create(
 void OnceTask::save()
 {
     SQLite::Statement update(database(),
-        "UPDATE once_tasks SET name = ?, duration = ?, minimum_split_size = ?, "
-        "due_date = ?, schedule_after = ? WHERE id = ?");
+                             "UPDATE once_tasks SET name = ?, duration = ?, minimum_split_size = ?, "
+                             "due_date = ?, schedule_after = ? WHERE id = ?");
     update.bind(1, name);
     update.bind(2, duration);
     update.bind(3, minimum_split_size);
@@ -101,11 +104,12 @@ void OnceTask::save()
     update.bind(6, id);
     update.exec();
 
-    if (database().getChanges() == 0) {
+    if (database().getChanges() == 0)
+    {
         SQLite::Statement insert(database(),
-            "INSERT INTO once_tasks "
-            "(id, name, duration, minimum_split_size, due_date, schedule_after) "
-            "VALUES (?, ?, ?, ?, ?, ?)");
+                                 "INSERT INTO once_tasks "
+                                 "(id, name, duration, minimum_split_size, due_date, schedule_after) "
+                                 "VALUES (?, ?, ?, ?, ?, ?)");
         insert.bind(1, id);
         insert.bind(2, name);
         insert.bind(3, duration);
@@ -116,7 +120,7 @@ void OnceTask::save()
     }
 }
 
-void RepeatingTask::setup(const char* database_path)
+void RepeatingTask::setup(const char *database_path)
 {
     open_database(database_path);
     database().exec(
@@ -131,9 +135,10 @@ void RepeatingTask::setup(const char* database_path)
 
     repo_vector.clear();
     SQLite::Statement query(database(),
-        "SELECT id, name, duration, minimum_split_size, starting_date, repeat_every_days "
-        "FROM repeating_tasks");
-    while (query.executeStep()) {
+                            "SELECT id, name, duration, minimum_split_size, starting_date, repeat_every_days "
+                            "FROM repeating_tasks");
+    while (query.executeStep())
+    {
         repo_vector.push_back(std::shared_ptr<RepeatingTask>(new RepeatingTask(
             query.getColumn(0).getInt64(),
             query.getColumn(1).getString(),
@@ -152,9 +157,9 @@ std::shared_ptr<RepeatingTask> RepeatingTask::create(
     YotsubaTime minimum_split_size)
 {
     SQLite::Statement insert(database(),
-        "INSERT INTO repeating_tasks "
-        "(name, duration, minimum_split_size, starting_date, repeat_every_days) "
-        "VALUES (?, ?, ?, ?, ?)");
+                             "INSERT INTO repeating_tasks "
+                             "(name, duration, minimum_split_size, starting_date, repeat_every_days) "
+                             "VALUES (?, ?, ?, ?, ?)");
     insert.bind(1, name);
     insert.bind(2, duration);
     insert.bind(3, minimum_split_size);
@@ -172,8 +177,8 @@ std::shared_ptr<RepeatingTask> RepeatingTask::create(
 void RepeatingTask::save()
 {
     SQLite::Statement update(database(),
-        "UPDATE repeating_tasks SET name = ?, duration = ?, minimum_split_size = ?, "
-        "starting_date = ?, repeat_every_days = ? WHERE id = ?");
+                             "UPDATE repeating_tasks SET name = ?, duration = ?, minimum_split_size = ?, "
+                             "starting_date = ?, repeat_every_days = ? WHERE id = ?");
     update.bind(1, name);
     update.bind(2, duration);
     update.bind(3, minimum_split_size);
@@ -182,11 +187,12 @@ void RepeatingTask::save()
     update.bind(6, id);
     update.exec();
 
-    if (database().getChanges() == 0) {
+    if (database().getChanges() == 0)
+    {
         SQLite::Statement insert(database(),
-            "INSERT INTO repeating_tasks "
-            "(id, name, duration, minimum_split_size, starting_date, repeat_every_days) "
-            "VALUES (?, ?, ?, ?, ?, ?)");
+                                 "INSERT INTO repeating_tasks "
+                                 "(id, name, duration, minimum_split_size, starting_date, repeat_every_days) "
+                                 "VALUES (?, ?, ?, ?, ?, ?)");
         insert.bind(1, id);
         insert.bind(2, name);
         insert.bind(3, duration);
@@ -197,7 +203,7 @@ void RepeatingTask::save()
     }
 }
 
-void OnceOffTime::setup(const char* database_path)
+void OnceOffTime::setup(const char *database_path)
 {
     open_database(database_path);
     database().exec(
@@ -211,9 +217,10 @@ void OnceOffTime::setup(const char* database_path)
 
     repo_vector.clear();
     SQLite::Statement query(database(),
-        "SELECT id, name, start_date, duration, is_buffer "
-        "FROM once_off_times");
-    while (query.executeStep()) {
+                            "SELECT id, name, start_date, duration, is_buffer "
+                            "FROM once_off_times");
+    while (query.executeStep())
+    {
         repo_vector.push_back(std::shared_ptr<OnceOffTime>(new OnceOffTime(
             query.getColumn(0).getInt64(),
             query.getColumn(1).getString(),
@@ -230,8 +237,8 @@ std::shared_ptr<OnceOffTime> OnceOffTime::create(
     bool is_buffer)
 {
     SQLite::Statement insert(database(),
-        "INSERT INTO once_off_times (name, start_date, duration, is_buffer) "
-        "VALUES (?, ?, ?, ?)");
+                             "INSERT INTO once_off_times (name, start_date, duration, is_buffer) "
+                             "VALUES (?, ?, ?, ?)");
     insert.bind(1, name);
     insert.bind(2, start_date);
     insert.bind(3, duration);
@@ -247,8 +254,8 @@ std::shared_ptr<OnceOffTime> OnceOffTime::create(
 void OnceOffTime::save()
 {
     SQLite::Statement update(database(),
-        "UPDATE once_off_times SET name = ?, start_date = ?, duration = ?, "
-        "is_buffer = ? WHERE id = ?");
+                             "UPDATE once_off_times SET name = ?, start_date = ?, duration = ?, "
+                             "is_buffer = ? WHERE id = ?");
     update.bind(1, name);
     update.bind(2, start_date);
     update.bind(3, duration);
@@ -256,10 +263,11 @@ void OnceOffTime::save()
     update.bind(5, id);
     update.exec();
 
-    if (database().getChanges() == 0) {
+    if (database().getChanges() == 0)
+    {
         SQLite::Statement insert(database(),
-            "INSERT INTO once_off_times (id, name, start_date, duration, is_buffer) "
-            "VALUES (?, ?, ?, ?, ?)");
+                                 "INSERT INTO once_off_times (id, name, start_date, duration, is_buffer) "
+                                 "VALUES (?, ?, ?, ?, ?)");
         insert.bind(1, id);
         insert.bind(2, name);
         insert.bind(3, start_date);
@@ -269,7 +277,7 @@ void OnceOffTime::save()
     }
 }
 
-void RepeatingOffTime::setup(const char* database_path)
+void RepeatingOffTime::setup(const char *database_path)
 {
     open_database(database_path);
     database().exec(
@@ -284,9 +292,10 @@ void RepeatingOffTime::setup(const char* database_path)
 
     repo_vector.clear();
     SQLite::Statement query(database(),
-        "SELECT id, name, start_date, duration, repeat_every_days, is_buffer "
-        "FROM repeating_off_times");
-    while (query.executeStep()) {
+                            "SELECT id, name, start_date, duration, repeat_every_days, is_buffer "
+                            "FROM repeating_off_times");
+    while (query.executeStep())
+    {
         repo_vector.push_back(std::shared_ptr<RepeatingOffTime>(new RepeatingOffTime(
             query.getColumn(0).getInt64(),
             query.getColumn(1).getString(),
@@ -305,9 +314,9 @@ std::shared_ptr<RepeatingOffTime> RepeatingOffTime::create(
     bool is_buffer)
 {
     SQLite::Statement insert(database(),
-        "INSERT INTO repeating_off_times "
-        "(name, start_date, duration, repeat_every_days, is_buffer) "
-        "VALUES (?, ?, ?, ?, ?)");
+                             "INSERT INTO repeating_off_times "
+                             "(name, start_date, duration, repeat_every_days, is_buffer) "
+                             "VALUES (?, ?, ?, ?, ?)");
     insert.bind(1, name);
     insert.bind(2, start_date);
     insert.bind(3, duration);
@@ -325,8 +334,8 @@ std::shared_ptr<RepeatingOffTime> RepeatingOffTime::create(
 void RepeatingOffTime::save()
 {
     SQLite::Statement update(database(),
-        "UPDATE repeating_off_times SET name = ?, start_date = ?, duration = ?, "
-        "repeat_every_days = ?, is_buffer = ? WHERE id = ?");
+                             "UPDATE repeating_off_times SET name = ?, start_date = ?, duration = ?, "
+                             "repeat_every_days = ?, is_buffer = ? WHERE id = ?");
     update.bind(1, name);
     update.bind(2, start_date);
     update.bind(3, duration);
@@ -335,11 +344,12 @@ void RepeatingOffTime::save()
     update.bind(6, id);
     update.exec();
 
-    if (database().getChanges() == 0) {
+    if (database().getChanges() == 0)
+    {
         SQLite::Statement insert(database(),
-            "INSERT INTO repeating_off_times "
-            "(id, name, start_date, duration, repeat_every_days, is_buffer) "
-            "VALUES (?, ?, ?, ?, ?, ?)");
+                                 "INSERT INTO repeating_off_times "
+                                 "(id, name, start_date, duration, repeat_every_days, is_buffer) "
+                                 "VALUES (?, ?, ?, ?, ?, ?)");
         insert.bind(1, id);
         insert.bind(2, name);
         insert.bind(3, start_date);

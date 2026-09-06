@@ -9,37 +9,38 @@
 
 using YotsubaTime = std::int64_t;
 
-void setup_all(const char* database_path);
+void setup_all(const char *database_path);
 
-class OnceTask {
+class OnceTask
+{
 public:
   static std::shared_ptr<OnceTask> create(
-    std::string name,
-    YotsubaTime duration,
-    YotsubaTime due_date,
-    YotsubaTime schedule_after = -1,
-    YotsubaTime minimum_split_size = -1);
+      std::string name,
+      YotsubaTime duration,
+      YotsubaTime due_date,
+      YotsubaTime schedule_after = -1,
+      YotsubaTime minimum_split_size = -1);
 
-    void save();
+  void save();
 
-    std::string name;
-    YotsubaTime duration;
-    YotsubaTime minimum_split_size;
-    YotsubaTime due_date;
-    YotsubaTime schedule_after;
+  std::string name;
+  YotsubaTime duration;
+  YotsubaTime minimum_split_size;
+  YotsubaTime due_date;
+  YotsubaTime schedule_after;
 
-    static void setup(const char* database_path);
+  static void setup(const char *database_path);
 
-  private:
-    static std::vector<std::shared_ptr<OnceTask>> repo_vector;
-    std::int64_t id;
+private:
+  static std::vector<std::shared_ptr<OnceTask>> repo_vector;
+  std::int64_t id;
 
-    OnceTask(std::int64_t id,
-         std::string name,
-         YotsubaTime duration,
-         YotsubaTime due_date,
-         YotsubaTime schedule_after,
-         YotsubaTime minimum_split_size)
+  OnceTask(std::int64_t id,
+           std::string name,
+           YotsubaTime duration,
+           YotsubaTime due_date,
+           YotsubaTime schedule_after,
+           YotsubaTime minimum_split_size)
       : id(id),
         name(std::move(name)),
         duration(duration),
@@ -48,35 +49,36 @@ public:
         schedule_after(schedule_after) {}
 };
 
-class RepeatingTask {
+class RepeatingTask
+{
 public:
-    static std::shared_ptr<RepeatingTask> create(
+  static std::shared_ptr<RepeatingTask> create(
       std::string name,
       YotsubaTime duration,
       YotsubaTime starting_date,
       YotsubaTime repeat_every_days,
       YotsubaTime minimum_split_size = -1);
 
-    void save();
+  void save();
 
-    std::string name;
-    YotsubaTime duration;
-    YotsubaTime minimum_split_size;
-    YotsubaTime starting_date;
-    YotsubaTime repeat_every_days;
+  std::string name;
+  YotsubaTime duration;
+  YotsubaTime minimum_split_size;
+  YotsubaTime starting_date;
+  YotsubaTime repeat_every_days;
 
-    static void setup(const char* database_path);
+  static void setup(const char *database_path);
 
-  private:
-    static std::vector<std::shared_ptr<RepeatingTask>> repo_vector;
-    std::int64_t id;
+private:
+  static std::vector<std::shared_ptr<RepeatingTask>> repo_vector;
+  std::int64_t id;
 
-    RepeatingTask(std::int64_t id,
-            std::string name,
-            YotsubaTime duration,
-            YotsubaTime starting_date,
-            YotsubaTime repeat_every_days,
-            YotsubaTime minimum_split_size)
+  RepeatingTask(std::int64_t id,
+                std::string name,
+                YotsubaTime duration,
+                YotsubaTime starting_date,
+                YotsubaTime repeat_every_days,
+                YotsubaTime minimum_split_size)
       : id(id),
         name(std::move(name)),
         duration(duration),
@@ -85,32 +87,33 @@ public:
         repeat_every_days(repeat_every_days) {}
 };
 
-class OnceOffTime {
+class OnceOffTime
+{
 public:
-    static std::shared_ptr<OnceOffTime> create(
+  static std::shared_ptr<OnceOffTime> create(
       std::string name,
       YotsubaTime start_date,
       YotsubaTime duration,
       bool is_buffer);
 
-    void save();
+  void save();
 
-    std::string name;
-    YotsubaTime start_date;
-    YotsubaTime duration;
-    bool is_buffer;
+  std::string name;
+  YotsubaTime start_date;
+  YotsubaTime duration;
+  bool is_buffer;
 
-    static void setup(const char* database_path);
+  static void setup(const char *database_path);
 
-  private:
-    static std::vector<std::shared_ptr<OnceOffTime>> repo_vector;
-    std::int64_t id;
+private:
+  static std::vector<std::shared_ptr<OnceOffTime>> repo_vector;
+  std::int64_t id;
 
-    OnceOffTime(std::int64_t id,
-          std::string name,
-          YotsubaTime start_date,
-          YotsubaTime duration,
-          bool is_buffer)
+  OnceOffTime(std::int64_t id,
+              std::string name,
+              YotsubaTime start_date,
+              YotsubaTime duration,
+              bool is_buffer)
       : id(id),
         name(std::move(name)),
         start_date(start_date),
@@ -118,41 +121,42 @@ public:
         is_buffer(is_buffer) {}
 };
 
-class RepeatingOffTime {
+class RepeatingOffTime
+{
 public:
-    static std::shared_ptr<RepeatingOffTime> create(
+  static std::shared_ptr<RepeatingOffTime> create(
       std::string name,
       YotsubaTime start_date,
       YotsubaTime duration,
       YotsubaTime repeat_every_days,
       bool is_buffer);
 
-    void save();
+  void save();
 
-    std::string name;
-    YotsubaTime start_date;
-    YotsubaTime duration;
-    YotsubaTime repeat_every_days;
-    bool is_buffer;
+  std::string name;
+  YotsubaTime start_date;
+  YotsubaTime duration;
+  YotsubaTime repeat_every_days;
+  bool is_buffer;
 
-    static void setup(const char* database_path);
+  static void setup(const char *database_path);
 
 private:
-    static std::vector<std::shared_ptr<RepeatingOffTime>> repo_vector;
+  static std::vector<std::shared_ptr<RepeatingOffTime>> repo_vector;
   std::int64_t id;
 
   RepeatingOffTime(std::int64_t id,
-           std::string name,
-                     YotsubaTime start_date,
-                     YotsubaTime duration,
-                     YotsubaTime repeat_every_days,
-                     bool is_buffer)
-        : id(id),
-          name(std::move(name)),
-          start_date(start_date),
-          duration(duration),
-          repeat_every_days(repeat_every_days),
-          is_buffer(is_buffer) {}
+                   std::string name,
+                   YotsubaTime start_date,
+                   YotsubaTime duration,
+                   YotsubaTime repeat_every_days,
+                   bool is_buffer)
+      : id(id),
+        name(std::move(name)),
+        start_date(start_date),
+        duration(duration),
+        repeat_every_days(repeat_every_days),
+        is_buffer(is_buffer) {}
 };
 
 #endif

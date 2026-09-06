@@ -1,11 +1,20 @@
 #include <QAbstractListModel>
 
-struct TodoItem { QString title; bool done = false; };
+struct TodoItem
+{
+    QString title;
+    bool done = false;
+};
 
-class TodoModel : public QAbstractListModel {
+class TodoModel : public QAbstractListModel
+{
     Q_OBJECT
 public:
-    enum Roles { TitleRole = Qt::UserRole + 1, DoneRole };
+    enum Roles
+    {
+        TitleRole = Qt::UserRole + 1,
+        DoneRole
+    };
     explicit TodoModel(QObject *parent = nullptr);
 
     int rowCount(const QModelIndex &parent = {}) const override;
