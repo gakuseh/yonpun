@@ -189,6 +189,12 @@ public:
     std::vector<YotsubaTime> get_times_of_event(CalendarEvent event) const;
 
 private:
+    Calendar(
+        YotsubaTime first_time,
+        std::vector<CalendarEvent> &&events_by_time,
+        std::unordered_map<CalendarEvent, std::vector<YotsubaTime>,
+                           CalendarEventHash, CalendarEventEqual> &&times_by_event);
+
     YotsubaTime first_time;
     std::vector<CalendarEvent> events_by_time;
     std::unordered_map<CalendarEvent, std::vector<YotsubaTime>, CalendarEventHash,

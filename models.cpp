@@ -401,6 +401,17 @@ bool CalendarEventEqual::operator()(
                left, right);
 }
 
+Calendar::Calendar(
+    YotsubaTime first_time,
+    std::vector<CalendarEvent> &&events_by_time,
+    std::unordered_map<CalendarEvent, std::vector<YotsubaTime>,
+                       CalendarEventHash, CalendarEventEqual> &&times_by_event)
+    : first_time(first_time),
+      events_by_time(std::move(events_by_time)),
+      times_by_event(std::move(times_by_event))
+{
+}
+
 Calendar Calendar::create(
     std::vector<std::shared_ptr<OnceTask>> once_tasks,
     std::vector<std::shared_ptr<RepeatingTask>> repeating_tasks,
@@ -411,7 +422,11 @@ Calendar Calendar::create(
     (void)repeating_tasks;
     (void)once_off_times;
     (void)repeating_off_times;
-    return Calendar{};
+    return Calendar(
+        0,
+        std::vector<CalendarEvent>{},
+        std::unordered_map<CalendarEvent, std::vector<YotsubaTime>,
+                           CalendarEventHash, CalendarEventEqual>{});
 }
 
 CalendarEvent Calendar::get_event_at_time(YotsubaTime time) const
