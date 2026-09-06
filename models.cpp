@@ -359,3 +359,69 @@ void RepeatingOffTime::save()
         insert.exec();
     }
 }
+
+std::size_t CalendarEventHash::operator()(const CalendarEvent &event) const
+{
+    const std::size_t type = event.index();
+    const std::size_t id = std::visit(
+        [](const auto &event_pointer)
+        {
+            const auto event_object = event_pointer.lock();
+            return event_object ? static_cast<std::size_t>(event_object->id) : 0;
+        },
+        event);
+
+    // Hash mixing source - https://stackoverflow.com/a/50978188 by Wolfgang Brehm
+    // casting uint64 to size_t might've messed it up... im not sure how to make
+    // hash functions
+    std::uint64_t x = static_cast<std::uint64_t>(type) ^
+                      (static_cast<std::uint64_t>(id) << 32);
+    constexpr std::uint64_t m = 0xe9846afb1a615dULL;
+    x ^= x >> 32;
+    x *= m;
+    x ^= x >> 32;
+    x *= m;
+    x ^= x >> 28;
+    return static_cast<std::size_t>(x);
+}
+
+bool CalendarEventEqual::operator()(
+    const CalendarEvent &left, const CalendarEvent &right) const
+{
+    return left.index() == right.index() &&
+           std::visit(
+               [](const auto &left_event, const auto &right_event)
+               {
+                   const auto left_object = left_event.lock();
+                   const auto right_object = right_event.lock();
+                   const auto left_id = left_object ? left_object->id : 0;
+                   const auto right_id = right_object ? right_object->id : 0;
+                   return left_id == right_id;
+               },
+               left, right);
+}
+
+Calendar Calendar::create(
+    std::vector<std::shared_ptr<OnceTask>> once_tasks,
+    std::vector<std::shared_ptr<RepeatingTask>> repeating_tasks,
+    std::vector<std::shared_ptr<OnceOffTime>> once_off_times,
+    std::vector<std::shared_ptr<RepeatingOffTime>> repeating_off_times)
+{
+    (void)once_tasks;
+    (void)repeating_tasks;
+    (void)once_off_times;
+    (void)repeating_off_times;
+    return Calendar{};
+}
+
+CalendarEvent Calendar::get_event_at_time(YotsubaTime time) const
+{
+    (void)time;
+    return CalendarEvent{std::weak_ptr<OnceTask>{}};
+}
+
+std::vector<YotsubaTime> Calendar::get_times_of_event(CalendarEvent event) const
+{
+    (void)event;
+    return {};
+}
