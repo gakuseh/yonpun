@@ -90,7 +90,30 @@ std::shared_ptr<OnceTask> OnceTask::create(
 
 void OnceTask::save()
 {
-    // TODO: Persist the task fields to the database.
+    SQLite::Statement update(database(),
+        "UPDATE once_tasks SET name = ?, duration = ?, minimum_split_size = ?, "
+        "due_date = ?, schedule_after = ? WHERE id = ?");
+    update.bind(1, name);
+    update.bind(2, duration);
+    update.bind(3, minimum_split_size);
+    update.bind(4, due_date);
+    update.bind(5, schedule_after);
+    update.bind(6, id);
+    update.exec();
+
+    if (database().getChanges() == 0) {
+        SQLite::Statement insert(database(),
+            "INSERT INTO once_tasks "
+            "(id, name, duration, minimum_split_size, due_date, schedule_after) "
+            "VALUES (?, ?, ?, ?, ?, ?)");
+        insert.bind(1, id);
+        insert.bind(2, name);
+        insert.bind(3, duration);
+        insert.bind(4, minimum_split_size);
+        insert.bind(5, due_date);
+        insert.bind(6, schedule_after);
+        insert.exec();
+    }
 }
 
 void RepeatingTask::setup(const char* database_path)
@@ -148,7 +171,30 @@ std::shared_ptr<RepeatingTask> RepeatingTask::create(
 
 void RepeatingTask::save()
 {
-    // TODO: Persist the task fields to the database.
+    SQLite::Statement update(database(),
+        "UPDATE repeating_tasks SET name = ?, duration = ?, minimum_split_size = ?, "
+        "starting_date = ?, repeat_every_days = ? WHERE id = ?");
+    update.bind(1, name);
+    update.bind(2, duration);
+    update.bind(3, minimum_split_size);
+    update.bind(4, starting_date);
+    update.bind(5, repeat_every_days);
+    update.bind(6, id);
+    update.exec();
+
+    if (database().getChanges() == 0) {
+        SQLite::Statement insert(database(),
+            "INSERT INTO repeating_tasks "
+            "(id, name, duration, minimum_split_size, starting_date, repeat_every_days) "
+            "VALUES (?, ?, ?, ?, ?, ?)");
+        insert.bind(1, id);
+        insert.bind(2, name);
+        insert.bind(3, duration);
+        insert.bind(4, minimum_split_size);
+        insert.bind(5, starting_date);
+        insert.bind(6, repeat_every_days);
+        insert.exec();
+    }
 }
 
 void OnceOffTime::setup(const char* database_path)
@@ -200,7 +246,27 @@ std::shared_ptr<OnceOffTime> OnceOffTime::create(
 
 void OnceOffTime::save()
 {
-    // TODO: Persist the off-time fields to the database.
+    SQLite::Statement update(database(),
+        "UPDATE once_off_times SET name = ?, start_date = ?, duration = ?, "
+        "is_buffer = ? WHERE id = ?");
+    update.bind(1, name);
+    update.bind(2, start_date);
+    update.bind(3, duration);
+    update.bind(4, is_buffer ? 1 : 0);
+    update.bind(5, id);
+    update.exec();
+
+    if (database().getChanges() == 0) {
+        SQLite::Statement insert(database(),
+            "INSERT INTO once_off_times (id, name, start_date, duration, is_buffer) "
+            "VALUES (?, ?, ?, ?, ?)");
+        insert.bind(1, id);
+        insert.bind(2, name);
+        insert.bind(3, start_date);
+        insert.bind(4, duration);
+        insert.bind(5, is_buffer ? 1 : 0);
+        insert.exec();
+    }
 }
 
 void RepeatingOffTime::setup(const char* database_path)
@@ -258,5 +324,28 @@ std::shared_ptr<RepeatingOffTime> RepeatingOffTime::create(
 
 void RepeatingOffTime::save()
 {
-    // TODO: Persist the off-time fields to the database.
+    SQLite::Statement update(database(),
+        "UPDATE repeating_off_times SET name = ?, start_date = ?, duration = ?, "
+        "repeat_every_days = ?, is_buffer = ? WHERE id = ?");
+    update.bind(1, name);
+    update.bind(2, start_date);
+    update.bind(3, duration);
+    update.bind(4, repeat_every_days);
+    update.bind(5, is_buffer ? 1 : 0);
+    update.bind(6, id);
+    update.exec();
+
+    if (database().getChanges() == 0) {
+        SQLite::Statement insert(database(),
+            "INSERT INTO repeating_off_times "
+            "(id, name, start_date, duration, repeat_every_days, is_buffer) "
+            "VALUES (?, ?, ?, ?, ?, ?)");
+        insert.bind(1, id);
+        insert.bind(2, name);
+        insert.bind(3, start_date);
+        insert.bind(4, duration);
+        insert.bind(5, repeat_every_days);
+        insert.bind(6, is_buffer ? 1 : 0);
+        insert.exec();
+    }
 }
