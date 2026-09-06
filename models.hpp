@@ -1,5 +1,5 @@
-#ifndef YONPUN_TASKS_HPP
-#define YONPUN_TASKS_HPP
+#ifndef YONPUN_MODELS_HPP
+#define YONPUN_MODELS_HPP
 
 #include <cstdint>
 #include <memory>
