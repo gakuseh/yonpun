@@ -418,6 +418,8 @@ Calendar Calendar::create(
     std::vector<std::shared_ptr<OnceOffTime>> once_off_times,
     std::vector<std::shared_ptr<RepeatingOffTime>> repeating_off_times)
 {
+    /* TODO: Write scheduling algorithm */
+
     (void)once_tasks;
     (void)repeating_tasks;
     (void)once_off_times;

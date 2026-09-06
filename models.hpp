@@ -179,6 +179,7 @@ struct CalendarEventEqual
 class Calendar
 {
 public:
+    /* Schedules Tasks and returns a calendar */
     static Calendar create(
         std::vector<std::shared_ptr<OnceTask>> once_tasks,
         std::vector<std::shared_ptr<RepeatingTask>> repeating_tasks,
