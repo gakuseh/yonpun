@@ -360,7 +360,7 @@ void RepeatingOffTime::save()
     }
 }
 
-std::size_t CalendarVariantHash::operator()(const CalendarVariant &event) const
+std::size_t ScheduleVariantHash::operator()(const ScheduleVariant &event) const
 {
     const std::size_t type = event.index();
     const std::size_t id = std::visit(
@@ -385,8 +385,8 @@ std::size_t CalendarVariantHash::operator()(const CalendarVariant &event) const
     return static_cast<std::size_t>(x);
 }
 
-bool CalendarVariantEqual::operator()(
-    const CalendarVariant &left, const CalendarVariant &right) const
+bool ScheduleVariantEqual::operator()(
+    const ScheduleVariant &left, const ScheduleVariant &right) const
 {
     return left.index() == right.index() &&
            std::visit(
@@ -401,18 +401,18 @@ bool CalendarVariantEqual::operator()(
                left, right);
 }
 
-Calendar::Calendar(
+Schedule::Schedule(
     YotsubaTime first_time,
-    std::vector<CalendarVariant> &&events_by_time,
-    std::unordered_map<CalendarVariant, std::vector<YotsubaTime>,
-                       CalendarVariantHash, CalendarVariantEqual> &&times_by_event)
+    std::vector<ScheduleVariant> &&events_by_time,
+    std::unordered_map<ScheduleVariant, std::vector<YotsubaTime>,
+                       ScheduleVariantHash, ScheduleVariantEqual> &&times_by_event)
     : first_time(first_time),
       events_by_time(std::move(events_by_time)),
       times_by_event(std::move(times_by_event))
 {
 }
 
-Calendar Calendar::create(
+const Schedule Schedule::create(
     std::vector<std::shared_ptr<OnceTask>> once_tasks,
     std::vector<std::shared_ptr<RepeatingTask>> repeating_tasks,
     std::vector<std::shared_ptr<OnceOffTime>> once_off_times,
@@ -424,14 +424,14 @@ Calendar Calendar::create(
     (void)repeating_tasks;
     (void)once_off_times;
     (void)repeating_off_times;
-    return Calendar(
+    return Schedule(
         0,
-        std::vector<CalendarVariant>{},
-        std::unordered_map<CalendarVariant, std::vector<YotsubaTime>,
-                           CalendarVariantHash, CalendarVariantEqual>{});
+        std::vector<ScheduleVariant>{},
+        std::unordered_map<ScheduleVariant, std::vector<YotsubaTime>,
+                           ScheduleVariantHash, ScheduleVariantEqual>{});
 }
 
-CalendarVariant Calendar::get_event_at_time(YotsubaTime time) const
+ScheduleVariant Schedule::get_event_at_time(YotsubaTime time) const
 {
     if (time < this->first_time || time >= this->first_time + static_cast<YotsubaTime>(events_by_time.size()))
     {
@@ -440,7 +440,7 @@ CalendarVariant Calendar::get_event_at_time(YotsubaTime time) const
     return events_by_time[static_cast<std::size_t>(time - this->first_time)];
 }
 
-std::vector<YotsubaTime> Calendar::get_times_of_event(CalendarVariant event) const
+const std::vector<YotsubaTime> Schedule::get_times_of_event(ScheduleVariant event) const
 {
     (void)event;
     return {};
