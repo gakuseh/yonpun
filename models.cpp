@@ -1,6 +1,7 @@
 #include "models.hpp"
 
 #include <SQLiteCpp/SQLiteCpp.h>
+#include <type_traits>
 
 namespace
 {
@@ -366,8 +367,17 @@ std::size_t ScheduleVariantHash::operator()(const ScheduleVariant &event) const
     const std::size_t id = std::visit(
         [](const auto &event_pointer)
         {
-            const auto event_object = event_pointer.lock();
-            return event_object ? static_cast<std::size_t>(event_object->id) : 0;
+            using Event = std::decay_t<decltype(event_pointer)>;
+
+            if constexpr (std::is_same_v<Event, std::monostate>)
+            {
+                return std::size_t{0};
+            }
+            else
+            {
+                const auto event_object = event_pointer.lock();
+                return event_object ? static_cast<std::size_t>(event_object->id) : 0;
+            }
         },
         event);
 
@@ -388,17 +398,37 @@ std::size_t ScheduleVariantHash::operator()(const ScheduleVariant &event) const
 bool ScheduleVariantEqual::operator()(
     const ScheduleVariant &left, const ScheduleVariant &right) const
 {
-    return left.index() == right.index() &&
-           std::visit(
-               [](const auto &left_event, const auto &right_event)
-               {
-                   const auto left_object = left_event.lock();
-                   const auto right_object = right_event.lock();
-                   const auto left_id = left_object ? left_object->id : 0;
-                   const auto right_id = right_object ? right_object->id : 0;
-                   return left_id == right_id;
-               },
-               left, right);
+    if (left.index() != right.index())
+    {
+        return false;
+    }
+
+    if (left.index() == 0 && right.index() == 0)
+    {
+        return true;
+    }
+
+    return std::visit(
+        [](const auto &left_event, const auto &right_event)
+        {
+            using Left = std::decay_t<decltype(left_event)>;
+            using Right = std::decay_t<decltype(right_event)>;
+
+            if constexpr (std::is_same_v<Left, std::monostate> ||
+                          std::is_same_v<Right, std::monostate>)
+            {
+                return std::is_same_v<Left, Right>;
+            }
+            else
+            {
+                const auto left_object = left_event.lock();
+                const auto right_object = right_event.lock();
+                const auto left_id = left_object ? left_object->id : 0;
+                const auto right_id = right_object ? right_object->id : 0;
+                return left_id == right_id;
+            }
+        },
+        left, right);
 }
 
 Schedule::Schedule(
