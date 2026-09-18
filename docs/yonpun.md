@@ -201,25 +201,105 @@ Scheduling algorithm may create its own representations of the tasks and
 offtimes; these must be internal to the scheduling "unit" and should not leak
 out
 
-Algorithm for now should be constraints programming (?)
+## Data structures and types
 
-Start by identifying the last occurance of OnceTask or OnceOffTime
+```cpp
+using ScheduleVariant = std::variant<std::monostate,
+                                     std::weak_ptr<OnceTask>,
+                                     std::weak_ptr<RepeatingTask>,
+                                     std::weak_ptr<OnceOffTime>,
+                                     std::weak_ptr<RepeatingOffTime>>;
+```
 
-Create a vector that lasts from now to the last occurance. If now is not an
-exact interval of 15 minutes, then use the next 15 minute interval as the start.
-The vector holds
-`std::variant<std::weak_ptr<OnceTask>, std::weak_ptr<RepeatingTask>, std::weak_ptr<OnceOffTime>, std::weak_ptr<RepeatingOffTime>>`.
+Create `TaskSplit` struct:
+- Private to translation unit, i.e., only in the source file.
+- Holds `YotsubaTime duration`, `std::variant<OnceTask, RepeatingTask> event`
 
-Fill in the schedule with Blocks that point to OffTimes
+Also create `TaskSplitCompare` with `operator()` that compares first by due date of the `event`, then by duration 
+if they are the same due date.
 
-....
+## Algorithm
 
-Then, create a vector of `TaskSplit` structs. They have a weak_ptr to a
-Once/Repeating Task, as well as the size in 15 min intervals as an
-`unsigned int`. The point of the `TaskSplit` is to ensure that the minimum split
-size is respected for each task. `TaskSplit`s are created from `OnceOffTime` and
-`RepeatingTask` shared pointers and their information. `TaskSplit` only store
-their size as
+This algorithm is a "prototype" algorithm, used as a minimum viable product, and is essentially a naive backtracking
+algorithm with minimal heuristics. Future versions should improve the heuristics of this backtracking or use a more 
+sophisticated algorithm, i.e. with scheduling theory algorithms.
 
-Sort of the vector of TaskSplits by due date first, then size of task split
-within the due date, in increasing order, i.e. earliest due date then
+Create a representation for "TaskSplit". A TaskSplit will be the elements we place into our Schedule, and it is the 
+object that is placed by each recursive step of the Backtracking algorithm. A TaskSplit is some structure that keeps 
+track of the task it is for, as well as the duration to work on this Task. The duration of each TaskSplit should be the 
+same size of the minimum split size dictated by the Task. The only exception to this is if there is a "remainder" 
+duration that is smaller than the minimum split size. In this exception, the TaskSplit will be the same size as the 
+remaining duration.
+
+For example, a Task with duration 75 minutes and minimum split size 30 minutes will have three TaskSplits, two with 
+duration 30 minutes (following the minimum split size) and one with duration 15 minutes (which holds the remainder).
+
+Each TaskSplit also keeps track of its "schedule after time" and its due date.
+
+Before we begin backtracking, we create a  `TaskSplitCollection`, which is described in the next section. Essentially,
+it is a vector of `TaskSplit` objects, where earliest due date and longest duration are FIRST, but also provides extra
+methods for iterating through the collection and also preventing duplicate TaskSplits in the schedule. The reasoning for
+this data structure should become clear as we describe the rest of the algorithm.
+
+We now finally begin backtracking. Backtracking consists of a recursive function. The function returns a true if all
+task splits have been scheduled and a solution has been found, and false otherwise.
+
+There are two base cases for this recursive function. One, there are no more TaskSplits we need to schedule, and so we
+return true and end all recursive calls. Two, we still have TaskSplits we need to schedule, but there are no more gaps
+in the schedule where we can place things. In this case, we return false, and the above recursive call handles the rest.
+
+Now we describe the recursive step of this backtracking algorithm. First, we need a loop. Every loop iteration, we need
+to find the next TaskSplit to schedule. Thus, before we enter the loop, we create a `TaskSplitIterator` object. Next, we
+enter the loop. In every iteration, we dereference the iterator and hide the `TaskSplit` it points to. Using 
+`TaskSplitIterator` is described in the next section.
+
+We then enter another loop. Every iteration of this nested loop tries a different starting time in the
+schedule, and places the `TaskSplit` at that time. If the placement is valid, then we recursively call the backtracking
+function again. If the recursive call returns true, then we return true. If the recursive call returns false, then we
+continue to the next iteration of the nested loop. If we have tried all possible starting times and none of them work,
+then we exit the nested loop.
+
+Once we are out of the nested loop, we show the `TaskSplit`, and increment the iterator. We then continue to the next
+iteration.
+
+If the nested loop never ends up returning true, then we know that there is no valid schedule for the remaining 
+TaskSplits. In this case, we return false.
+
+### Iterating through TaskSplits
+
+Correctly iterating through TaskSplits in a controlled way helps to reach successful schedules faster.
+
+To do this, we wrap the `TaskSplit` collection with a `TaskSplitCollection` class. The Constructor takes in a collection
+of Task objects. The class then provides an `TaskSplitIterator` iterator object. Iterating works such that `TaskSplits`
+with earliest due dates and longest durations that haven't been hidden/placed in the schedule appear FIRST. 
+Dereferencing the iterator produces a `TaskSplit`. Incrementing the iterator makes the iterator point to the next
+`TaskSplit`. `TaskSplitCollection` has both an `hide` and `show` method that takes in a `TaskSplitIterator`. Hiding 
+means any future created iterators will not give the erased `TaskSplit`, and showing "brings back" the `TaskSplit` that
+was "hidden", so that iterators created in the future will give the `TaskSplit` again. This is intended to be used in 
+the following manner: when a `TaskSplit` is scheduled, it should be hidden. Further recursive steps will thus not see 
+this `TaskSplit` through the interator, and so `TaskSplits` will not be placed twice. Then, if the recursion backtracks 
+and the `TaskSplit` is removed from the Schedule, it should be shown again.
+
+Internally, `TaskSplitCollection` uses a `const std::vector<TaskSplit>` to store the `TaskSplit`s, as well as a 
+`std::vector<bool>` that is the same size as the aforementioned vector, which keeps track if a `TaskSplit` is hidden. 
+Hiding/showing `TaskSplits` updates the `std::vector<bool>`. 
+
+As for `TaskSplitIterator`, it keeps track of a `size_t` index into the aforementioned vector. Every time 
+`TaskSplitIterator` is incremented, this index is incremented until it points to a `TaskSplit` that is not hidden.
+
+### Discussion
+
+I believe the biggest source of optimization will come from smartly selecting the next time to place the TaskSplit. 
+We already have a heuristic controls which TaskSplit comes next, so the same thinking can be applied to controlling 
+which gap comes next. We can find a place to schedule where the gap is as small and close to the TaskSplit's
+duration as possible. Any implementations need to be careful to not have finding a gap take too much time, and also the
+complexity of handling how gap representations and their ordering (if used) might change once a `TaskSplit` is placed
+
+For example, if a `TaskSplit` is placed in the middle of a gap, we have to create two new gaps structures, fit that
+in our gap collection in a smart way, etc. This problem doesn't happen with `TaskSplits` because placing a `TaskSplit`
+doesn't split up the `TaskSplit` and produce new `TaskSplits`.
+
+Beyond backtracking, we can also study scheduling theory algorithms. I believe this problem can be described roughly as
+$1 | r_j | unit penalty$ in scheduling notation.
+
+Other, more minor ways to optimize include improving finding the next task split so that it isn't O(n) worst case.
