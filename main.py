@@ -51,7 +51,7 @@ class YotsubaTime:
     __rmul__ = __mul__
 
     def to_datetime(self) -> datetime:
-        return datetime.fromtimestamp(self.time * _UNIT + _EPOCH)
+        return datetime.fromtimestamp(self.time * _UNIT + _EPOCH, tz=timezone.utc)
 
     def __lt__(self, other: int | datetime | timedelta | YotsubaTime) -> bool:
         if isinstance(other, YotsubaTime):
@@ -117,23 +117,43 @@ class OnceOffTime:
         self.start = YotsubaTime(start)
         self.end = YotsubaTime(end)
 
+class RepeatOnDaysOfWeek:
+    days: bitarray # 0th bit is monday, 6th bit is sunday
+    start_time: datetime # time of day + tzinfo give the wall-clock time of each occurrence; the date is when repetition begins
+    end_time: datetime # only the time of day is used; if it is at or before start_time's time of day, the occurrence ends the next day
+
+    def __init__(self, days: bitarray, start_time: datetime, end_time: datetime):
+        if len(days) != 7:
+            raise ValueError('RepeatOnDaysOfWeek days must have exactly 7 bits')
+        if start_time.tzinfo is None:
+            raise ValueError('RepeatOnDaysOfWeek start_time must be timezone-aware')
+        if end_time.tzinfo != start_time.tzinfo:
+            raise ValueError('RepeatOnDaysOfWeek end_time must have the same timezone as start_time')
+
+        self.days = days
+        self.start_time = start_time
+        self.end_time = end_time
+
+class RepeatEvery:
+    start_time: YotsubaTime # YotsubaTime representing actual date from epoch
+    repeat_every: YotsubaTime
+    duration: YotsubaTime
+
+    def __init__(self, start_time: YotsubaTime, repeat_every: YotsubaTime, duration: YotsubaTime):
+        if repeat_every <= 0:
+            raise ValueError('RepeatEvery repeat_every must be positive')
+
+        self.start_time = start_time
+        self.repeat_every = repeat_every
+        self.duration = duration
 class RepeatingOffTime:
     name: str
-    start: YotsubaTime
-    duration: YotsubaTime
-    repeat_every: YotsubaTime
+    repeat_setting: RepeatEvery | RepeatOnDaysOfWeek
     
 
-    def __init__(self, name: str, start: datetime, duration: int, repeat_every: timedelta):
-        if duration <= 0:
-            raise ValueError('RepeatingOffTime duration must be positive')
-        if repeat_every <= timedelta(0):
-            raise ValueError('RepeatingOffTime repeat_every must be positive')
-
+    def __init__(self, name: str, repeat_setting: RepeatOnDaysOfWeek | RepeatEvery):
         self.name = name
-        self.start = YotsubaTime(start)
-        self.duration = YotsubaTime(duration)
-        self.repeat_every = YotsubaTime(repeat_every)
+        self.repeat_setting = repeat_setting
 
 class OnceTask:
     name: str
@@ -407,13 +427,39 @@ class Schedule:
     def place_repeating_offtime(self, off_time: RepeatingOffTime):
         '''Places a RepeatingOffTime in the schedule. If the off time is outside the bounds of the schedule, it will be truncated to fit within the schedule.'''
 
-        current_start_index: int = max(0, (off_time.start - self._first_time).time)
+        setting = off_time.repeat_setting
 
-        while current_start_index < len(self._events_by_time):
-            for i in range(current_start_index, min(current_start_index + off_time.duration.time, len(self._events_by_time))):
-                self._events_by_time[i] = off_time
+        if isinstance(setting, RepeatEvery):
+            current_start_index: int = (setting.start_time - self._first_time).time
 
-            current_start_index += off_time.repeat_every.time
+            while current_start_index < len(self._events_by_time):
+                for i in range(max(0, current_start_index), min(current_start_index + setting.duration.time, len(self._events_by_time))):
+                    self._events_by_time[i] = off_time
+
+                current_start_index += setting.repeat_every.time
+        else:
+            tz = setting.start_time.tzinfo
+            schedule_end = self._first_time + len(self._events_by_time)
+
+            # Start a day early so an occurrence that began yesterday and runs past midnight is still placed
+            current_date = max(setting.start_time.date(), self._first_time.to_datetime().astimezone(tz).date() - timedelta(days=1))
+            last_date = schedule_end.to_datetime().astimezone(tz).date()
+
+            while current_date <= last_date:
+                if setting.days[current_date.weekday()]:
+                    occurrence_start = datetime.combine(current_date, setting.start_time.timetz())
+                    # Wall-clock end time, so an occurrence spanning a DST change is an hour longer or shorter
+                    end_date = current_date if setting.end_time.time() > setting.start_time.time() else current_date + timedelta(days=1)
+                    occurrence_end = datetime.combine(end_date, setting.end_time.timetz())
+
+                    # Round outward so off time is never shortened
+                    start_index = max(0, (YotsubaTime(occurrence_start, floor=True) - self._first_time).time)
+                    end_index = min((YotsubaTime(occurrence_end) - self._first_time).time, len(self._events_by_time))
+
+                    for i in range(start_index, end_index):
+                        self._events_by_time[i] = off_time
+
+                current_date += timedelta(days=1)
 
     def get_event_at_time(self, time: YotsubaTime) -> OnceOffTime | RepeatingOffTime | OnceTask | RepeatingTask | None:
         index: int = (time - self._first_time).time
